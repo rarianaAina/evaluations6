@@ -19,6 +19,13 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/', 'PagesController@dashboard');
     Route::get('dashboard', 'PagesController@dashboard')->name('dashboard');
 
+
+    /**
+     * Import
+     */
+    Route::get('import', 'ImportController@showImportForm')->name('import.form');
+    Route::post('/import', 'ImportController@importClients')->name('import');
+    
     /**
      * Users
      */
