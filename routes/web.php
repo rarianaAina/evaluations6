@@ -1,4 +1,6 @@
 <?php
+
+use Illuminate\Support\Facades\Route;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -25,6 +27,11 @@ Route::group(['middleware' => ['auth']], function () {
      */
     Route::get('import', 'ImportController@showImportForm')->name('import.form');
     Route::post('/import', 'ImportController@importClients')->name('import');
+
+    /**
+     * Import
+     */
+    Route::get('resetTables', 'ResetTableController@resetTables')->name('resetTables');
     
     /**
      * Users
