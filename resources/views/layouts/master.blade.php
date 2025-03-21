@@ -57,7 +57,7 @@
                 <a href="{{route('dashboard')}}" class=" list-group-item" data-parent="#MainMenu"><i
                         class="fa fa-home sidebar-icon"></i><span id="menu-txt">{{ __('Dashboard') }} </span></a>
                 @if(Entrust::can('client-create'))
-                <a href="{{route('import')}}" class=" list-group-item" data-parent="#MainMenu"><i
+                <a href="{{route('import.index')}}" class=" list-group-item" data-parent="#MainMenu"><i
                         class="fa fa-home sidebar-icon"></i><span id="menu-txt">{{ __('Import') }} </span></a>
                 @endif
                 @if(Entrust::can('client-create'))

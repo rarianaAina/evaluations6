@@ -18,7 +18,7 @@
             </div>
         @endif
 
-        <form action="{{ route('import') }}" method="POST" enctype="multipart/form-data">
+        <form action="{{ route('import.upload') }}" method="POST" enctype="multipart/form-data">
             @csrf
             <div class="mb-3">
                 <label for="csv_file" class="form-label">{{ __('Select CSV File') }}</label>

@@ -46,11 +46,13 @@ Route::group(['middleware' => ['auth']], function () {
     /**
      * Import
      */
-    Route::get('import', 'ImportController@showImportForm')->name('import.form');
-    Route::post('/import', 'ImportController@importClients')->name('import');
+    Route::prefix('import')->name('import.')->group(function(): void {
+        Route::get('/', 'ImportController@index')->name('index');
+        Route::post('/upload', 'ImportController@uploadCsv')->name('upload');
+    });
 
     /**
-     * Import
+     * Reset
      */
     Route::get('resetTables', 'ResetTableController@resetTables')->name('resetTables');
     

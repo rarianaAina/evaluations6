@@ -3,30 +3,42 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Maatwebsite\Excel\Facades\Excel;
-use App\Imports\ClientsImport;
+use App\Services\Import\ImportCsv;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
+use Exception;
+use Illuminate\Support\Facades\Session;
 
 class ImportController extends Controller
 {
-    /**
-     * Affiche le formulaire d'importation de clients.
-     */
-    public function showImportForm()
+    private $importCsv;
+
+    public function __construct(ImportCsv $importCsv)
     {
-        return view('import.clients');
+        $this->importCsv = $importCsv;
     }
 
-    /**
-     * Traite le fichier CSV pour importer des clients.
-     */
-    public function importClients(Request $request)
+     
+    public function index()
     {
-        $request->validate([
-            'csv_file' => 'required|mimes:csv,txt|max:2048'
-        ]);
+        return view("import.index");
+    }
 
-        Excel::import(new ClientsImport, $request->file('csv_file'));
-
-        return redirect()->back()->with('success', 'Importation réussie.');
+    public function uploadCsv(Request $request)
+    {
+          
+         if ($request->hasFile('csv_file') && $request->file('csv_file')->isValid()) {
+            $file = $request->file('csv_file');
+            $filePath = $file->storeAs('csv', 'data.csv', 'local');  
+     
+            $result = $this->importCsv->importFromCsv(storage_path("app/csv/data.csv"));
+    
+            Session::flash('success', 'Importation réussie');
+            Session::flash('import_message', $result);
+        } else {
+            Session::flash('error', 'Erreur lors de l\'importation du fichier CSV.');
+        }
+    
+        return redirect()->route('import.index');
     }
 }
