@@ -41,6 +41,7 @@ return [
     'dropbox' => [
         'client_id' => env('DROPBOX_CLIENT_ID', null),
         'client_secret' => env('DROPBOX_CLIENT_SECRET', null),
+        'redirect' => env('DROPBOX_REDIRECT_URI'),
     ],
     'google-drive' => [
         'client_id' => env('GOOGLE_DRIVE_CLIENT_ID', null),
