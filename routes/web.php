@@ -1,6 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Services\Storage\Authentication\DropboxAuthenticator;
+use Illuminate\Http\Request;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -15,6 +17,25 @@ Route::auth();
 Route::get('/logout', 'Auth\LoginController@logout');
 Route::group(['middleware' => ['auth']], function () {
 
+
+
+    Route::get('/dropbox/auth', function() {
+        $authenticator = new DropboxAuthenticator();
+        return redirect()->away($authenticator->authUrl());
+    })->name('dropbox.auth');
+    
+    Route::get('/dropbox/callback', function(Request $request) {
+        $authenticator = new DropboxAuthenticator();
+        $token = $authenticator->token($request->get('code'));
+    
+        // Stocker le token dans la base de données ou l'environnement
+        \App\Models\Integration::updateOrCreate(
+            ['api_type' => 'file', 'name' => 'dropbox'],
+            ['api_key' => $token]
+        );
+    
+        return redirect()->route('integrations.index')->with('success', 'Dropbox connecté avec succès.');
+    })->name('dropbox.callback');
     /**
      * Main
      */
