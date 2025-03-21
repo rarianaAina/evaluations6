@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Services\Storage\Authentication\DropboxAuthenticator;
+use App\Http\Controllers\DatabaseSeederController;
 use Illuminate\Http\Request;
 /*
 |--------------------------------------------------------------------------
@@ -51,6 +52,11 @@ Route::group(['middleware' => ['auth']], function () {
         Route::post('/upload', 'ImportController@uploadCsv')->name('upload');
     });
 
+    /**
+     * Data generation
+     */
+    Route::get('seed-dummy', 'DatabaseSeederController@seed')->name('seed.dummy');
+    
     /**
      * Reset
      */
