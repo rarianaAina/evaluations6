@@ -4,6 +4,8 @@
 Homestead.yaml
 Homestead.json
 .env
+~$ToDo.xlsx
+ToDo.xlsx
 bower_components
 
 .docker/flarepoint-db/*

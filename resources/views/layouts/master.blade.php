@@ -60,6 +60,10 @@
                 <a href="{{route('import')}}" class=" list-group-item" data-parent="#MainMenu"><i
                         class="fa fa-home sidebar-icon"></i><span id="menu-txt">{{ __('Import') }} </span></a>
                 @endif
+                @if(Entrust::can('client-create'))
+                <a href="{{route('resetTables')}}" class=" list-group-item" data-parent="#MainMenu"><i
+                        class="fa fa-home sidebar-icon"></i><span id="menu-txt">{{ __('Réinitialiser') }} </span></a>
+                @endif
                 <a href="{{route('users.show', \Auth::user()->external_id)}}" class=" list-group-item"
                     data-parent="#MainMenu"><i
                         class="fa fa-user sidebar-icon"></i><span id="menu-txt">{{ __('Profile') }}</span> </a>
