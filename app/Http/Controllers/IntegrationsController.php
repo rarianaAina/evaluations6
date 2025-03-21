@@ -40,20 +40,25 @@ class IntegrationsController extends Controller
      */
     public function store(Request $request)
     {
+        // Validation des données
+        $request->validate([
+            'api_type' => 'required|string',
+            'api_key' => 'nullable|string',
+            'api_secret' => 'nullable|string',
+        ]);
+
         $input = $request->all();
 
-        $existing = Integration::where([
-            // 'user_id' => $request->post['user_id'] ? $userId : null,
-            'api_type' => $request->api_type
-        ])->get();
-        $existing = isset($existing[0]) ? $existing[0] : null;
+        // Vérifier si une intégration du même type existe déjà
+        $existing = Integration::where('api_type', $request->api_type)->first();
 
         if ($existing) {
-            $existing->fill($input)->save();
+            $existing->update($input);
         } else {
             Integration::create($input);
         }
 
-        return $this->index();
+        return redirect()->route('integrations.index')->with('success', 'Intégration mise à jour avec succès.');
     }
+
 }
