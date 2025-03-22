@@ -15,6 +15,7 @@ class TasksDummyTableSeeder extends Seeder
      */
     public function run()
     {
+        dump("Avant création des tâches, nombre d'utilisateurs : " . User::count());
         factory(Task::class, 50)->create([
             'client_id' => Client::all()->random()->id,
             'user_created_id' => User::all()->random()->id,
@@ -41,5 +42,6 @@ class TasksDummyTableSeeder extends Seeder
                 'user_id' => User::all()->random()->id,
             ]);
         });
+        dump("Après création des tâches, nombre d'utilisateurs : " . User::count());
     }
 }

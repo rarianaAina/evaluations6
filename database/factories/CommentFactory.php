@@ -11,7 +11,7 @@ use Faker\Generator as Faker;
 $factory->define(Comment::class, function (Faker $faker) {
     return [
         'external_id' => \Ramsey\Uuid\Uuid::uuid4()->toString(),
-        'user_id' => factory(User::class),
+        'user_id' => User::exists() ? User::inRandomOrder()->first()->id : factory(User::class)->create()->id,
         'source_type' => Task::class,
         'source_id' => factory(Task::class),
         'description' => $faker->paragraph(rand(2,10))
