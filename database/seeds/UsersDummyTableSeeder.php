@@ -29,24 +29,15 @@ class UsersDummyTableSeeder extends Seeder
         $createDep->external_id = Uuid::uuid4();
         $createDep->save();
 
-        // factory(User::class, 5)->create()->each(function ($u) {
-        //     if(rand(1, 4) == 3) {
-        //         factory(Absence::class)->create([
-        //             'user_id' => $u->id
-        //         ]);
-        //     }
-        // });
-
         factory(User::class, 5)->create()->each(function ($u) {
-            //dump("Utilisateur créé : " . $u->id); // Ajoute cette ligne pour voir combien d'utilisateurs sont créés
-            
             if(rand(1, 4) == 3) {
                 factory(Absence::class)->create([
                     'user_id' => $u->id
                 ]);
             }
         });
-              
+
+      
         $u = User::query()->latest()->first();
         factory(Absence::class)->create([
             'user_id' => $u->id,
@@ -54,7 +45,5 @@ class UsersDummyTableSeeder extends Seeder
             'end_at' => now()->addDays(1),
         ]);
       
-        $userCount = User::count();
-        dump("Nombre total d'utilisateurs dans la base : $userCount");
     }
 }
