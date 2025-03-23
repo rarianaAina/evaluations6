@@ -16,21 +16,22 @@ class ResetTableService
 
         // Liste des tables à vider
         $tablesToReset = [
-            'mails',
-            'comments',
-            'absences',
             'leads',
-            'projects',
+            'comments',
+            'mails',
             'tasks',
+            'projects',
+            'absences',
             'contacts',
-            'industries',
-            'appointments',
-            'clients',
-            'offers',
-            'invoices',
             'invoice_lines',
-            'payments'
+            'appointments',
+            'payments',
+            'invoices',
+            'offers',
+            'clients'
         ];
+        
+
 
         // Exécuter le TRUNCATE sur chaque table
         foreach ($tablesToReset as $table) {
