@@ -1,10 +1,12 @@
 <?php
+
 namespace App\Services\Invoice;
 
 use App\Models\Offer;
 use App\Models\Invoice;
 use App\Repositories\Tax\Tax;
 use App\Repositories\Money\Money;
+use App\Models\SettingsConfig;
 
 class InvoiceCalculator
 {
@@ -19,7 +21,7 @@ class InvoiceCalculator
 
     public function __construct($invoice)
     {
-        if(!$invoice instanceof Invoice && !$invoice instanceof Offer ) {
+        if (!$invoice instanceof Invoice && !$invoice instanceof Offer) {
             throw new \Exception("Not correct type for Invoice Calculator");
         }
         $this->tax = new Tax();
@@ -32,6 +34,11 @@ class InvoiceCalculator
         return new Money($price * $this->tax->vatRate());
     }
 
+    public function getRemise(): float
+    {
+        return SettingsConfig::where('key', 'global_discount_rate')->value('value') ?? 0;
+    }
+
 
     public function getTotalPrice(): Money
     {
@@ -42,6 +49,8 @@ class InvoiceCalculator
             $price += $invoiceLine->quantity * $invoiceLine->price;
         }
 
+        $remise = $this->getRemise();
+        $price -= $price * $remise;
         return new Money($price);
     }
 
