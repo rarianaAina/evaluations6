@@ -81,7 +81,8 @@ class InvoicesController extends Controller
         $subPrice = $invoiceCalculator->getSubTotal();
         $vatPrice = $invoiceCalculator->getVatTotal();
         $amountDue = $invoiceCalculator->getAmountDue();
-        
+        $remise =  $invoiceCalculator->getRemise();
+
         return view('invoices.show')
             ->withInvoice($invoice)
             ->withApiconnected($apiConnected)
@@ -90,6 +91,7 @@ class InvoicesController extends Controller
             ->withsubPrice(app(MoneyConverter::class, ['money' => $subPrice])->format())
             ->withVatPrice(app(MoneyConverter::class, ['money' => $vatPrice])->format())
             ->withAmountDueFormatted(app(MoneyConverter::class, ['money' => $amountDue])->format())
+            ->withRemise($remise)
             ->withPrimaryContact(optional($primaryContact)[0])
             ->withPaymentSources(PaymentSource::values())
             ->withAmountDue($amountDue)
