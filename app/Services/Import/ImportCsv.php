@@ -28,7 +28,7 @@ class ImportCsv
 
             foreach ($data as $row) {
                 if (empty(array_filter($row))) {
-                    continue;
+                    continue; 
                 }
 
                 if (strtolower(trim($row[0])) == 'table_name') {
