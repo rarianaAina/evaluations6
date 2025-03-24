@@ -186,7 +186,7 @@
                         class="fa fa-home sidebar-icon"></i><span id="menu-txt">{{ __('Réinitialiser') }} </span></a>
                 @endif
                 @if(Entrust::can('client-create'))
-                <a href="{{route('seed.dummy')}}" class=" list-group-item" data-parent="#MainMenu"><i
+                <a href="{{route('generate.index')}}" class=" list-group-item" data-parent="#MainMenu"><i
                         class="fa fa-home sidebar-icon"></i><span id="menu-txt">{{ __('Générer données') }} </span></a>
                 @endif
             </div>

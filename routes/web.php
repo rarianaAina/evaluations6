@@ -194,6 +194,12 @@ Route::group(['middleware' => ['auth']], function () {
     });
     Route::resource('integrations', 'IntegrationsController');
 
+
+    Route::prefix('generate')->name('generate.')->group(function () {
+        Route::get('/', 'GenerateData@index')->name('index');
+        Route::post('/generate', 'GenerateData@generate')->name('generate');
+    });
+    
     /**
      * Notifications
      */

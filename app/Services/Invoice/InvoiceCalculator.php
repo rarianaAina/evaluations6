@@ -54,6 +54,17 @@ class InvoiceCalculator
         return new Money($price);
     }
 
+    public function getTotalPriceSR(): Money
+    {
+        $price = 0;
+        $invoiceLines = $this->invoice->invoiceLines;
+
+        foreach ($invoiceLines as $invoiceLine) {
+            $price += $invoiceLine->quantity * $invoiceLine->price;
+        }
+        return $price;
+    }
+
     public function getSubTotal(): Money
     {
         $price = 0;

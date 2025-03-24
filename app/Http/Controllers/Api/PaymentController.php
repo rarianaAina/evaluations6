@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Services\PaymentService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use App\Services\Invoice\GenerateInvoiceStatus;
 
 class PaymentController extends Controller
 {
@@ -31,6 +32,8 @@ class PaymentController extends Controller
     public function update(Request $request, $id): JsonResponse
     {
         $payment = $this->paymentService->updatePayment($id, $request->all());
+        
+        app(GenerateInvoiceStatus::class, ['invoice' => $invoice])->createStatus();
         return response()->json($payment);
     }
 
