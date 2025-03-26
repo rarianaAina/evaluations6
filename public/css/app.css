@@ -841,7 +841,7 @@ body {
 }
 
 .navmenu {
-  background-color: #242939;
+  background-color: #243932;
   top: 0;
   width: 260px;
   margin: 0;
@@ -859,7 +859,7 @@ body {
 }
 
 .list-group-item {
-  background-color: #242939;
+  background-color: #243932;
   border: none;
 }
 
@@ -943,13 +943,13 @@ a.list-group-item:hover i.sidebar-icon {
 }
 
 .childlist {
-  background-color: #242939;
+  background-color: #243932;
   padding-left: 45px !important;
 }
 
 .childlist a {
   color: #989eb3;
-  background-color: #242939;
+  background-color: #243932;
   padding-left: 50px !important;
 }
 
@@ -1050,7 +1050,7 @@ a.list-group-item:hover i.sidebar-icon {
   height: 3px;
   margin-bottom: 6px;
   border-radius: 1px;
-  background-color: #242939;
+  background-color: #243932;
 }
 
 .menu-txt-toggle .icon-bar:first-child {
@@ -1069,7 +1069,7 @@ a.list-group-item:hover i.sidebar-icon {
   height: 3px;
   margin-bottom: 6px;
   border-radius: 1px;
-  background-color: #242939;
+  background-color: #243932;
 }
 
 .mobile-nav .icon-bar:first-child {

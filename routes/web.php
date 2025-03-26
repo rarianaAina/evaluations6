@@ -47,9 +47,9 @@ Route::group(['middleware' => ['auth']], function () {
     /**
      * Import
      */
-    Route::prefix('import')->name('import.')->group(function(): void {
+    Route::prefix('import')->name('import.')->group(function () {
         Route::get('/', 'ImportController@index')->name('index');
-        Route::post('/upload', 'ImportController@uploadCsv')->name('upload');
+        Route::post('/upload', 'ImportController@import')->name('upload');
     });
 
     /**
@@ -194,6 +194,12 @@ Route::group(['middleware' => ['auth']], function () {
     });
     Route::resource('integrations', 'IntegrationsController');
 
+
+    Route::prefix('generate')->name('generate.')->group(function () {
+        Route::get('/', 'GenerateData@index')->name('index');
+        Route::post('/generate', 'GenerateData@generate')->name('generate');
+    });
+    
     /**
      * Notifications
      */

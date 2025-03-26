@@ -2,43 +2,113 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\Import\ImportService;
+use App\Services\Import\RepartitionService;
 use Illuminate\Http\Request;
-use App\Services\Import\ImportCsv;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Log;
-use Exception;
-use Illuminate\Support\Facades\Session;
 
 class ImportController extends Controller
 {
-    private $importCsv;
+    private $importService;
+    private $repartitionSevice;
 
-    public function __construct(ImportCsv $importCsv)
+    public function __construct(ImportService $importService,RepartitionService $repartitionSevice)
     {
-        $this->importCsv = $importCsv;
+        $this->importService = $importService;
+        $this->repartitionSevice = $repartitionSevice;
     }
 
-     
     public function index()
     {
         return view("import.index");
     }
 
-    public function uploadCsv(Request $request)
+    public function import(Request $request)
     {
-          
-         if ($request->hasFile('csv_file') && $request->file('csv_file')->isValid()) {
-            $file = $request->file('csv_file');
-            $filePath = $file->storeAs('csv', 'data.csv', 'local');  
-     
-            $result = $this->importCsv->importFromCsv(storage_path("app/csv/data.csv"));
-    
-            Session::flash('success', 'Importation réussie');
-            Session::flash('import_message', $result);
+        $request->validate([
+            'file' => 'required|file|mimes:csv,txt',
+            'file2' => 'required|file|mimes:csv,txt',
+            'file3' => 'required|file|mimes:csv,txt'
+        ]);
+
+        $fileNames = [
+            'file' => "CSV 1 : ".$request->file('file')->getClientOriginalName(),
+            'file2' => "CSV 2 : ".$request->file('file2')->getClientOriginalName(),
+            'file3' => "CSV 3 : ".$request->file('file3')->getClientOriginalName()
+        ];
+
+        // Démarrer une transaction pour toutes les opérations
+        $this->importService->clearAllTempData();
+        $allErrors = [];
+        $hasErrors = false;
+        $results = [];
+
+        // Importer les projets
+        $projectImportResult = $this->importService->importProjects($request->file('file'));
+        if ($projectImportResult['error']) {
+            $hasErrors = true;
+            $this->addFileSourceToErrors($projectImportResult['errors'], $fileNames['file']);
+            $allErrors = array_merge($allErrors, $projectImportResult['errors']);
         } else {
-            Session::flash('error', 'Erreur lors de l\'importation du fichier CSV.');
+            $results['projects'] = $projectImportResult['data'];
+            $results['imported_projects_rows'] = $projectImportResult['imported_rows'];
         }
-    
-        return redirect()->route('import.index');
+
+        // Importer les tâches seulement si pas d'erreur précédente
+        if (!$hasErrors) {
+            $taskImportResult = $this->importService->importProjectTasks($request->file('file2'));
+            if ($taskImportResult['error']) {
+                $hasErrors = true;
+                $this->addFileSourceToErrors($taskImportResult['errors'], $fileNames['file2']);
+                $allErrors = array_merge($allErrors, $taskImportResult['errors']);
+            } else {
+                $results['project_tasks'] = $taskImportResult['data'];
+                $results['imported_project_tasks_rows'] = $taskImportResult['imported_rows'];
+            }
+        }
+
+        // Importer les offres seulement si pas d'erreur précédente
+        if (!$hasErrors) {
+            $offerImportResult = $this->importService->importOffers($request->file('file3'));
+            if ($offerImportResult['error']) {
+                $hasErrors = true;
+                $this->addFileSourceToErrors($offerImportResult['errors'], $fileNames['file3']);
+                $allErrors = array_merge($allErrors, $offerImportResult['errors']);
+            } else {
+                $results['offers'] = $offerImportResult['data'];
+                $results['imported_offers_rows'] = $offerImportResult['imported_rows'];
+            }
+        }
+
+        // Si erreurs, tout supprimer
+        if ($hasErrors) {
+            $this->importService->clearAllTempData();
+            return back()->with([
+                'error' => 'Des erreurs sont survenues lors de l\'importation',
+                'import_errors' => $allErrors,
+                'file_name' => $fileNames['file'],
+                'file_name2' => $fileNames['file2'],
+                'file_name3' => $fileNames['file3'],
+                'skipped_rows' => count($allErrors)
+            ]);
+        }
+
+        $this->repartitionSevice->repartitionTempProject();
+        $this->repartitionSevice->repartitionTempProjectTask();
+        $this->repartitionSevice->repartitionTempOffer();
+        
+
+        return back()->with(array_merge([
+            'success' => 'Importation réussie',
+            'file_name' => $fileNames['file'],
+            'file_name2' => $fileNames['file2'],
+            'file_name3' => $fileNames['file3']
+        ], $results));
+    }
+
+    private function addFileSourceToErrors(&$errors, $fileName)
+    {
+        foreach ($errors as &$error) {
+            $error['source_file'] = $fileName;
+        }
     }
 }

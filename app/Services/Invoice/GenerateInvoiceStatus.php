@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Services\Invoice;
 
 use App\Enums\InvoiceStatus;
@@ -16,11 +17,16 @@ class GenerateInvoiceStatus
     /** @var int  */
     private $sum;
 
+    private $remise;
+
     public function __construct(Invoice $invoice)
     {
+        $calculator = app(InvoiceCalculator::class, ['invoice' => $invoice]);
+
         $this->invoice = $invoice;
-        $this->price = app(InvoiceCalculator::class, ['invoice' => $invoice])->getTotalPrice();
-        $this->sum = (int)$this->invoice->payments()->sum('amount');
+        $this->price = $calculator->getTotalPrice();
+        $this->sum = (int) $this->invoice->payments()->sum('amount');
+        $this->remise = $calculator->getRemise();
     }
 
     public function createStatus()
@@ -61,7 +67,7 @@ class GenerateInvoiceStatus
 
     public function isPaid(): bool
     {
-        return $this->price->getAmount() === $this->sum;
+        return $this->price->getAmount() == $this->sum;
     }
 
     public function isUnPaid(): bool
