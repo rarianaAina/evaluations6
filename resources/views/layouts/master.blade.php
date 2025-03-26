@@ -19,6 +19,7 @@
     <link rel="stylesheet" href="{{ asset(elixir('css/bootstrap-select.min.css')) }}">
     <link href="{{ URL::asset('css/summernote.css') }}" rel="stylesheet">
     <link rel="shortcut icon" href="{{{ asset('images/favicon.png') }}}">
+
     <script>
         var DayByDay = {
             csrfToken: "{{csrf_token()}}",
@@ -181,6 +182,7 @@
                 <a href="{{route('import.index')}}" class=" list-group-item" data-parent="#MainMenu"><i
                         class="fa fa-home sidebar-icon"></i><span id="menu-txt">{{ __('Import') }} </span></a>
                 @endif
+                
                 @if(Entrust::can('client-create'))
                 <a href="{{route('resetTables')}}" class=" list-group-item" data-parent="#MainMenu"><i
                         class="fa fa-home sidebar-icon"></i><span id="menu-txt">{{ __('Réinitialiser') }} </span></a>
