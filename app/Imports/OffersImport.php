@@ -24,10 +24,18 @@ class OffersImport implements
     
     private $rowNumber = 0;
 
+    private $expectedColumns = [
+        'client_name', 'lead_title', 'type', 'produit', 'prix', 'quantite'
+    ];
     public function model(array $row)
     {
         $this->rowNumber++;
         
+
+        $extraColumns = array_diff(array_keys($row), $this->expectedColumns);
+        if (!empty($extraColumns)) {
+            throw new \Exception("Colonnes non valides détectées : " . implode(', ', $extraColumns) . " à la ligne {$this->rowNumber}");
+        }
         // Validation manuelle supplémentaire
         if (empty($row['client_name'])) {
             throw new \Exception("Le nom du client est requis à la ligne {$this->rowNumber}");
@@ -39,6 +47,10 @@ class OffersImport implements
 
         if (empty($row['type'])) {
             throw new \Exception("Le type est requis à la ligne {$this->rowNumber}");
+        }
+
+        if ($row['type']!="invoice" && $row['type']!="offers") {
+            throw new \Exception("Le type doit etre soit invoice soit offers {$this->rowNumber}");
         }
 
         if (empty($row['produit'])) {
@@ -68,31 +80,116 @@ class OffersImport implements
         ]);
     }
 
+    // public function rules(): array
+    // {
+    //     return [
+    //         'client_name' => 'required|string|max:255',
+    //         'lead_title'  => 'required|string|max:255',
+    //         'type'        => 'required|string|max:50',
+    //         'produit'     => 'required|string|max:100',
+    //         'prix'        => [
+    //             'required',
+    //             function ($attribute, $value, $fail) {
+    //                 if ($this->convertToNumeric($value) === false) {
+    //                     $fail("Le champ $attribute doit être un nombre valide.");
+    //                 }
+    //             }
+    //         ],
+    //         'quantite'    => [
+    //             'required',
+    //             function ($attribute, $value, $fail) {
+    //                 if ($this->convertToInteger($value) === false) {
+    //                     $fail("Le champ $attribute doit être un nombre entier valide.");
+    //                 }
+    //             }
+    //         ],
+    //     ];
+    // }
+
+
+    // public function rules(): array
+    // {
+    //     return [
+    //         'client_name' => 'required|string|max:255',
+    //         'lead_title'  => 'required|string|max:255',
+    //         'type'        => 'required|string|max:50',
+    //         'produit'     => 'required|string|max:100',
+    //         'prix'        => 'required|integer',  // Vérifie que c'est un entier
+    //         'quantite'    => 'required|integer',  // Vérifie que c'est un entier
+    //     ];
+    // }
+
+
     public function rules(): array
     {
         return [
-            'client_name' => 'required|string|max:255',
-            'lead_title'  => 'required|string|max:255',
-            'type'        => 'required|string|max:50',
-            'produit'     => 'required|string|max:100',
-            'prix'        => [
+            'client_name' => [
                 'required',
+                'string',
+                'max:255',
                 function ($attribute, $value, $fail) {
-                    if ($this->convertToNumeric($value) === false) {
-                        $fail("Le champ $attribute doit être un nombre valide.");
+                    if (empty($value)) {
+                        $fail("Le nom du client est requis.");
                     }
                 }
             ],
-            'quantite'    => [
+            'lead_title' => [
                 'required',
+                'string',
+                'max:255',
                 function ($attribute, $value, $fail) {
-                    if ($this->convertToInteger($value) === false) {
-                        $fail("Le champ $attribute doit être un nombre entier valide.");
+                    if (empty($value)) {
+                        $fail("Le titre du lead est requis.");
+                    }
+                }
+            ],
+            'type' => [
+                'required',
+                'string',
+                'max:50',
+                function ($attribute, $value, $fail) {
+                    if (empty($value)) {
+                        $fail("Le type est requis.");
+                    } elseif ($value !== "invoice" && $value !== "offers") {
+                        $fail("Le type doit être soit 'invoice' soit 'offers'.");
+                    }
+                }
+            ],
+            'produit' => [
+                'required',
+                'string',
+                'max:100',
+                function ($attribute, $value, $fail) {
+                    if (empty($value)) {
+                        $fail("Le produit est requis.");
+                    }
+                }
+            ],
+            'prix' => [
+                'required',
+                'numeric',
+                'min:0',
+                function ($attribute, $value, $fail) {
+                    $prix = $this->convertToNumeric($value);
+                    if ($prix === false) {
+                        $fail("Le prix doit être un nombre valide.");
+                    }
+                }
+            ],
+            'quantite' => [
+                'required',
+                'integer',
+                function ($attribute, $value, $fail) {
+                    $quantite = $this->convertToInteger($value);
+                    if ($quantite === false) {
+                        $fail("La quantité doit être un nombre entier valide.");
                     }
                 }
             ],
         ];
     }
+
+
 
     /**
      * Convertit une chaîne avec virgule en nombre décimal
@@ -125,7 +222,10 @@ class OffersImport implements
     }
 
     public function onError(Throwable $e)
-    {
-        Log::error('Erreur lors de l\'import CSV: '.$e->getMessage());
+    {   
+        // return ['error' => true, 'message' => 'Erreur d\'importation: ' . $e->getMessage()];
+        Log::error('Erreur lors de l\'import CSV à la ligne ' . $this->rowNumber . ': ' . $e->getMessage());
+        
     }
+
 }

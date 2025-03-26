@@ -44,13 +44,40 @@ class ProjectsImport implements
         ]);
     }
 
+    // public function rules(): array
+    // {
+    //     return [
+    //         'project_title' => 'required|string|max:255',
+    //         'client_name' => 'required|string|max:255',
+    //     ];
+    // }
+
     public function rules(): array
     {
         return [
-            'project_title' => 'required|string|max:255',
-            'client_name' => 'required|string|max:255',
+            'project_title' => [
+                'required',
+                'string',
+                'max:255',
+                function ($attribute, $value, $fail) {
+                    if (empty($value)) {
+                        $fail("Le titre du projet est requis.");
+                    }
+                }
+            ],
+            'client_name' => [
+                'required',
+                'string',
+                'max:255',
+                function ($attribute, $value, $fail) {
+                    if (empty($value)) {
+                        $fail("Le nom du client est requis.");
+                    }
+                }
+            ],
         ];
     }
+
 
     public function onError(Throwable $e)
     {

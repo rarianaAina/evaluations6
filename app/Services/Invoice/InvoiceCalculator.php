@@ -62,7 +62,7 @@ class InvoiceCalculator
         foreach ($invoiceLines as $invoiceLine) {
             $price += $invoiceLine->quantity * $invoiceLine->price;
         }
-        return $price;
+        return new Money($price);
     }
 
     public function getSubTotal(): Money

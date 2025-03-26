@@ -41,13 +41,41 @@ class ProjectTasksImport implements
         ]);
     }
 
+    // public function rules(): array
+    // {
+    //     return [
+    //         'project_title' => 'required|string|max:255',
+    //         'task_title' => 'required|string|max:255',
+    //     ];
+    // }
+
+
     public function rules(): array
     {
         return [
-            'project_title' => 'required|string|max:255',
-            'task_title' => 'required|string|max:255',
+            'project_title' => [
+                'required',
+                'string',
+                'max:255',
+                function ($attribute, $value, $fail) {
+                    if (empty($value)) {
+                        $fail("Le titre du projet est requis.");
+                    }
+                }
+            ],
+            'task_title' => [
+                'required',
+                'string',
+                'max:255',
+                function ($attribute, $value, $fail) {
+                    if (empty($value)) {
+                        $fail("Le nom de la tâche est requis.");
+                    }
+                }
+            ],
         ];
     }
+
 
     public function onError(Throwable $e)
     {
