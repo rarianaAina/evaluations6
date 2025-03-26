@@ -213,12 +213,12 @@ class RepartitionService
                 }   
     
                 
-                $offer = Offer::where('source_type', "App\Models\Lead")
-                            ->where('source_id', $lead->id)
-                            ->where('client_id', $client->id)
-                            ->first();
+                // $offer = Offer::where('source_type', "App\Models\Lead")
+                //             ->where('source_id', $lead->id)
+                //             ->where('client_id', $client->id)
+                //             ->first();
     
-                if (!$offer) {
+                // if (!$offer) {
                     $offer = Offer::create([
                         'status' => OfferStatus::inProgress()->getStatus(),
                         'client_id' => $client->id,
@@ -229,14 +229,14 @@ class RepartitionService
 
     
                     
-                }
+                // }
 
                 $invoiceLine = InvoiceLine::where('product_id', $product->id)
                 ->where('offer_id', $offer->id)
-                ->whereNull('invoice_id') // Équivalent de where('invoice_id', null)
+                ->whereNull('invoice_id')
                 ->first();
                 if(!$invoiceLine){
-                    $invoiceLine = InvoiceLine::create([
+                    $invoiceLine = InvoiceLine::make([
                         'title' => $product->name,
                         'type' => $product->default_type,
                         'quantity' => $tempOffer->quantite,
@@ -246,22 +246,34 @@ class RepartitionService
                         'product_id' => $product->id,
                         'offer_id' => $offer->id
                     ]);
+
+                    $offer->invoiceLines()->save($invoiceLine);
                 }
 
-                
+                $invoice=Invoice::where('source_type','App\Models\Lead')->where('source_id', $lead->id)->where('offer_id', $offer->id)->first();
                 if ($tempOffer->type == "invoice") {
                     $offer->setAsWon();
+                    if(!$invoice){
+                       
     
-                    $invoice = Invoice::create($offer->toArray());
-                    $invoice->offer_id = $offer->id;
-                    $invoice->invoice_number = app(InvoiceNumberService::class)->setNextInvoiceNumber();
-                    $invoice->status = InvoiceStatus::draft()->getStatus();
+                        $invoice = Invoice::create($offer->toArray());
+                        $invoice->offer_id = $offer->id;
+                        $invoice->invoice_number = app(InvoiceNumberService::class)->setNextInvoiceNumber();
+                        $invoice->status = InvoiceStatus::draft()->getStatus();
+                    }
+                    // $invoice->created_at= now()->addSecond(20);
+                    // $invoice->updated_at= now()->addSecond(20);
+
                     $invoice->save();
                     
                     
                     $invoiceLine->offer_id = null;
                     $invoiceLine->invoice_id = $invoice->id;
-                    $newInvoiceLine=InvoiceLine::create($invoiceLine->toArray());
+                    // $invoiceLine->external_id="";
+                    // $invoiceLine->created_at= now()->addSecond(20);
+                    // $invoiceLine->updated_at= now()->addSecond(20);
+                    $newInvoiceLine=InvoiceLine::make($invoiceLine->toArray());
+                    $invoice->invoiceLines()->save($newInvoiceLine);
 
                 }
     
